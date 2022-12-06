@@ -10,6 +10,7 @@ import BackEnd.Agus.Security.Service.RolService;
 import BackEnd.Agus.Security.Service.UsuarioService;
 import BackEnd.Agus.Security.jwt.JwtProvider;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,11 +58,20 @@ public class AuthController {
         Usuario usuario = new Usuario(nuevoUsuario.getNombre(), nuevoUsuario.getNombreUsuario(),
             nuevoUsuario.getEmail(), passwordEncoder.encode(nuevoUsuario.getPassword()));
         
+        //Set<Rol> roles = new HashSet<>();
+        //roles.add(rolService.getByRolNombre(RolNombre.ROLE_USER).get());
+        
         Set<Rol> roles = new HashSet<>();
-        roles.add(rolService.getByRolNombre(RolNombre.ROLE_USER).get());
+        Optional<Rol> rol = rolService.getByRolNombre(RolNombre.ADMIN);
+        if(rol.isPresent()){
+            roles.add(rol.get());
+        } else {
+            System.out.println("El rol no existe");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("El rol no existe (CODE 500)\n");
+        }
         
         if(nuevoUsuario.getRoles().contains("admin"))
-            roles.add(rolService.getByRolNombre(RolNombre.ROLE_ADMIN).get());
+            roles.add(rolService.getByRolNombre(RolNombre.ADMIN).get());
         usuario.setRoles(roles);
         usuarioService.save(usuario);
         
