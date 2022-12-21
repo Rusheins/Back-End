@@ -1,1 +1,1 @@
-SELECT * FROM backendmgb.usuario_rol;
+SELECT * FROM backendmgb.hys;
